@@ -23,10 +23,10 @@ class Amazon::EcsTest < Test::Unit::TestCase
     assert(resp.total_pages >= 360)
     
     signature_elements = (resp.doc/"arguments/argument").select do |ele| 
-      ele.attributes['name'] == 'Signature' || ele.attributes['Name'] == 'Signature'
-    end.length
+      ele['name'] == 'Signature' || ele['Name'] == 'Signature'
+    end
     
-    assert(signature_elements == 1)
+    assert_equal 1, signature_elements.length
   end
       
   def test_item_search_with_special_characters
@@ -145,7 +145,7 @@ class Amazon::EcsTest < Test::Unit::TestCase
 
     first_author = item.get_element("author")
     assert_equal "Dave Thomas", first_author.get
-    assert_equal '', first_author.attributes['unknown']
+    assert_equal nil, first_author.attributes['unknown']
     
     item_height = item.get_element("itemdimensions/height")
     assert_equal "hundredths-inches", item_height.attributes['units']

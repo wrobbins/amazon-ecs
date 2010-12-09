@@ -22,7 +22,7 @@
 #++
 
 require 'net/http'
-require 'hpricot'
+require 'nokogiri'
 require 'cgi'
 require 'hmac-sha2'
 require 'base64'
@@ -120,14 +120,11 @@ module Amazon
 
     # Response object returned after a REST call to Amazon service.
     class Response
+      attr_reader :doc
+
       # XML input is in string format
       def initialize(xml)
-        @doc = Hpricot(xml)
-      end
-
-      # Return Hpricot object.
-      def doc
-        @doc
+        @doc = Nokogiri::HTML.parse(xml)
       end
 
       # Return true if request is valid.
@@ -263,7 +260,7 @@ module Amazon
       end
   end
 
-  # Internal wrapper class to provide convenient method to access Hpricot element value.
+  # Internal wrapper class to provide convenient method to access Nokogiri element value.
   class Element
     # Pass Hpricot::Elements object
     def initialize(element)
@@ -275,7 +272,7 @@ module Amazon
       @element
     end
     
-    # Find Hpricot::Elements matching the given path. Example: element/"author".
+    # Find Elements matching the given path. Example: element/"author".
     def /(path)
       elements = @element/path
       return nil if elements.size == 0
@@ -296,13 +293,12 @@ module Amazon
     def get_elements(path)
       elements = self./(path)
       return unless elements
-      elements = elements.map{|element| Element.new(element)}
+      elements.map{|element| Element.new(element)}
     end
     
     # Similar with search_and_convert but always return first element if more than one elements found
     def get_element(path)
-      elements = get_elements(path)
-      elements[0] if elements
+      (get_elements(path) || []).first
     end
 
     # Get the text value of the given path, leave empty to retrieve current element value.
@@ -327,13 +323,13 @@ module Amazon
     
     def attributes
       return unless self.elem
-      self.elem.attributes
+      Hash[self.elem.keys.zip(self.elem.values)]
     end
     
     # Similar to #get, except an element object must be passed-in.
     def self.get(element, path='')
       return unless element
-      result = element.at(path)
+      result = path.empty? ? element : element.at(path)
       result = result.inner_html if result
       result
     end
@@ -349,7 +345,7 @@ module Amazon
       return unless element
       
       result = element/path
-      if (result.is_a? Hpricot::Elements) || (result.is_a? Array)
+      if (result.is_a? Nokogiri::XML::NodeSet) || (result.is_a? Array)
         parsed_result = []
         result.each {|item|
           parsed_result << Element.get(item)
