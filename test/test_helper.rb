@@ -1,3 +1,3 @@
 require 'rubygems'
 require 'test/unit'
-require File.dirname(__FILE__) + '/../lib/amazon/ecs'
+require File.expand_path('../lib/amazon/ecs', File.dirname(__FILE__))

@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require File.expand_path('../test_helper', File.dirname(__FILE__))
 
 class Amazon::EcsTest < Test::Unit::TestCase
 
@@ -38,7 +38,7 @@ class Amazon::EcsTest < Test::Unit::TestCase
   def test_item_search_with_paging
     resp = Amazon::Ecs.item_search('ruby', :item_page => 2)
     assert resp.is_valid_request?
-    assert 2, resp.item_page
+    assert_equal 2, resp.item_page
   end
    
   def test_item_search_with_invalid_request
@@ -120,7 +120,7 @@ class Amazon::EcsTest < Test::Unit::TestCase
     
     assert_equal "Programming Ruby: The Pragmatic Programmers' Guide, Second Edition", title
     assert authors.is_a?(Array)
-    assert 3, authors.size
+    assert_equal 3, authors.size
     assert_equal "Dave Thomas", authors.first.get
   end
   
@@ -130,13 +130,13 @@ class Amazon::EcsTest < Test::Unit::TestCase
     
     authors = item.get_elements("author")
     assert authors.is_a?(Array)
-    assert 3, authors.size
+    assert_equal 3, authors.size
     assert authors.first.is_a?(Amazon::Element)
     assert_equal "Dave Thomas", authors.first.get
     
     asin = item.get_elements("asin")
     assert asin.is_a?(Array)
-    assert 1, authors.size
+    assert_equal 8, asin.size
   end
   
   def test_get_element_and_attributes
@@ -145,7 +145,7 @@ class Amazon::EcsTest < Test::Unit::TestCase
 
     first_author = item.get_element("author")
     assert_equal "Dave Thomas", first_author.get
-    assert_equal nil, first_author.attributes['unknown']
+    assert_equal '', first_author.attributes['unknown']
     
     item_height = item.get_element("itemdimensions/height")
     assert_equal "hundredths-inches", item_height.attributes['units']
