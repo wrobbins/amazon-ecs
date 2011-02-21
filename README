@@ -16,7 +16,7 @@ instead you just need to update the element path.
   $ gem install amazon-ecs
 
 Gemfile
-gem 'amazon-ecs', :git => "git://github.com/wrobbins/amazon-ecs.git"
+gem 'amazon-ecs', :git => 'git://github.com/wrobbins/amazon-ecs.git'
 
 == EXAMPLE
 
